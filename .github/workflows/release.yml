@@ -1,0 +1,42 @@
+name: Release
+
+# Push a tag such as v1.0.0 to build, test and publish a GitHub release.
+# Tags with a suffix (v1.1.0-beta.1) are published as pre-releases.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build, test and package
+        shell: pwsh
+        run: .\build.ps1 -Test -Package -Version "${{ github.ref_name }}"
+
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $version = $env:TAG.TrimStart('v')
+          $notes = @"
+          ## Download
+
+          - **Coatrack.exe**: the app on its own. Put it somewhere permanent, for example ``%LOCALAPPDATA%\Programs\Coatrack\``, and run it.
+          - **Coatrack-$version.zip**: the same exe with the README and licence.
+          - **SHA256SUMS.txt**: checksums. Check with ``Get-FileHash Coatrack.exe``.
+
+          Coatrack isn't code-signed, so Windows SmartScreen may warn the first time: click **More info** › **Run anyway**, or build it yourself with ``.\build.ps1``.
+
+          Coatrack is unofficial and isn't made by or affiliated with Anthropic.
+          "@
+          $flags = @()
+          if ($version -match '-') { $flags += '--prerelease' }
+          gh release create $env:TAG dist/* --title "Coatrack $version" --notes $notes --generate-notes @flags

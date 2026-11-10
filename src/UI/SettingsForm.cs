@@ -74,7 +74,21 @@ namespace Coatrack
             claudeButtons.Controls.Add(claudeAuto);
             root.Controls.Add(claudeButtons);
 
-            root.Controls.Add(Ui.Note(AppInfo.Name + " " + AppInfo.Version + ". Settings are saved in " +
+            root.Controls.Add(Ui.Heading("About"));
+            var about = new LinkLabel
+            {
+                Text = AppInfo.Name + " " + AppInfo.Version + " · " + AppInfo.RepositoryUrl.Replace("https://", ""),
+                AutoSize = true,
+                Margin = new Padding(0, 2, 0, 2)
+            };
+            about.LinkArea = new LinkArea(about.Text.IndexOf('·') + 2, AppInfo.RepositoryUrl.Length - "https://".Length);
+            about.LinkClicked += delegate
+            {
+                try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(AppInfo.RepositoryUrl) { UseShellExecute = true }); }
+                catch (Exception) { }
+            };
+            root.Controls.Add(about);
+            root.Controls.Add(Ui.Note("Unofficial; not made by or affiliated with Anthropic. Settings are saved in " +
                 PathUtil.Abbreviate(new ConfigStore(ConfigStore.DefaultFolder).FilePath) + ".", W));
 
             Activated += delegate { RefreshState(); };

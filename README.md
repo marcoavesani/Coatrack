@@ -1,5 +1,9 @@
 # Coatrack
 
+[![CI](https://github.com/marcoavesani/Coatrack/actions/workflows/ci.yml/badge.svg)](https://github.com/marcoavesani/Coatrack/actions/workflows/ci.yml)
+[![Latest release](https://img.shields.io/github/v/release/marcoavesani/Coatrack?include_prereleases&sort=semver)](https://github.com/marcoavesani/Coatrack/releases/latest)
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
+
 Run more than one Claude account on one Windows PC. Coatrack is a small notification-area (system tray) app that switches the Claude desktop app between separate **instances**, such as Work and Personal, without signing out and back in. Each instance has its own sign-in, chats, settings, MCP servers and Claude Code data. Only one instance runs at a time.
 
 It's a Windows take on [Hatstand](https://github.com/willblackmore/hatstand) for macOS, written from scratch.
@@ -18,15 +22,19 @@ It's a Windows take on [Hatstand](https://github.com/willblackmore/hatstand) for
 
 You need Windows 10 or 11 and the Claude desktop app (the Microsoft Store/MSIX build or the older installer).
 
-1. Build it (see below), or copy `Coatrack.exe` somewhere permanent, for example `%LOCALAPPDATA%\Programs\Coatrack\`.
-2. Run `Coatrack.exe`. The first time, the Manage Instances window opens.
+1. Download **Coatrack.exe** from the [latest release](https://github.com/marcoavesani/Coatrack/releases/latest) (or [build it yourself](#building)).
+2. Put it somewhere permanent, for example `%LOCALAPPDATA%\Programs\Coatrack\`, and run it. (Windows remembers where it is for sign-in links and start-at-sign-in, so don't run it from Downloads.) The first time, the Manage Instances window opens.
 3. Click **+** to add an instance (for example "Personal").
 4. When asked, **set up sign-in links**: Settings opens on Default apps. Find **CLAUDE** (URL:claude) and choose **Coatrack**. You only do this once.
 5. Open the new instance and sign in with your other account.
 
 Turn on **Start Coatrack when I sign in to Windows** in Settings if you like.
 
-Windows SmartScreen may warn about an unsigned app the first time; click **More info › Run anyway**, or build it yourself.
+Coatrack isn't code-signed, so Windows SmartScreen may warn the first time: click **More info › Run anyway**, or build it yourself. Each release lists SHA-256 checksums in `SHA256SUMS.txt`; compare with `Get-FileHash Coatrack.exe`.
+
+**Moving or updating Coatrack:** replace the exe in the same folder. If you move it, run it once from its new place (it updates its own registrations) and choose it again in Default apps if links stop working.
+
+**Uninstalling:** in Coatrack's Settings, click **Stop handling links** and untick **Start Coatrack when I sign in to Windows**, quit it, then delete the exe and `%LOCALAPPDATA%\Coatrack`. That folder also holds your instances' data unless you put them elsewhere, so move anything you want to keep first.
 
 ## How it works
 
@@ -78,6 +86,27 @@ The app is at `build\Coatrack.exe`. Run the unit tests with:
 ```
 
 The build first compiles a small tool that draws the app icon, so there are no binary assets in the repository.
+
+To stamp a version and make the release files (`dist\Coatrack.exe`, `dist\Coatrack-<version>.zip` and `dist\SHA256SUMS.txt`):
+
+```powershell
+.\build.ps1 -Test -Version 1.0.0 -Package
+```
+
+### Releases
+
+GitHub Actions builds and tests every push and pull request ([`ci.yml`](.github/workflows/ci.yml)). To publish a release, push a version tag:
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+[`release.yml`](.github/workflows/release.yml) then builds and tests that version, and creates a GitHub release with the exe, the zip and the checksums attached. A tag with a suffix, such as `v1.1.0-beta.1`, becomes a pre-release.
+
+## Contributing
+
+Issues and pull requests are welcome. Before opening a pull request, run `.\build.ps1 -Test`. The code must stay C# 5 so that it builds with the compiler built into Windows; [CLAUDE.md](CLAUDE.md) lists that constraint and the other design rules, plus the facts about Claude's behaviour on Windows that Coatrack relies on.
 
 ## Tips
 

@@ -121,7 +121,7 @@ namespace Coatrack.Tests
             string[] samples =
             {
                 "plain", "with space", @"C:\trailing\", @"C:\with space\", "quote\"inside", @"back\\slash\""quote", "", "claude://claude.ai/login?code=a&state=b",
-                @"--user-data-dir=C:\Users\Marco Avesani\AppData\Local\Coatrack\Instances\Work\app-data"
+                @"--user-data-dir=C:\Users\Jane Doe\AppData\Local\Coatrack\Instances\Work\app-data"
             };
             string cmd = "\"C:\\p\\claude.exe\" " + CommandLine.Join(samples);
             List<string> back = CommandLine.Split(cmd);

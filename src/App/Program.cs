@@ -8,15 +8,25 @@ using Microsoft.Win32;
 [assembly: AssemblyTitle("Coatrack")]
 [assembly: AssemblyDescription("Switch the Claude desktop app between separate instances on Windows.")]
 [assembly: AssemblyProduct("Coatrack")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+// AssemblyVersion, AssemblyFileVersion and AssemblyInformationalVersion come from build.ps1 (-Version).
 
 namespace Coatrack
 {
     public static class AppInfo
     {
         public const string Name = "Coatrack";
-        public const string Version = "1.0";
+        public const string RepositoryUrl = "https://github.com/marcoavesani/Coatrack";
+
+        /// <summary>The version set by build.ps1, for example "1.2.0" or "0.0.0-dev".</summary>
+        public static string Version
+        {
+            get
+            {
+                var attr = (AssemblyInformationalVersionAttribute)Attribute.GetCustomAttribute(
+                    typeof(AppInfo).Assembly, typeof(AssemblyInformationalVersionAttribute));
+                return attr != null ? attr.InformationalVersion : "0.0.0-dev";
+            }
+        }
     }
 
     static class Program
